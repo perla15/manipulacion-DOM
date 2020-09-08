@@ -1,0 +1,98 @@
+<?php 
+	$info = "";
+ 	#$info = file_get_contents('https://jsonplaceholder.typicode.com/todos/');
+	
+?>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		njkbh
+	</title>
+	<style type="text/css">
+		.container{
+			width: 80%;
+			margin: auto;
+			min-height: 200px;
+		} 
+
+		.table{
+			width: 40%;
+			margin: auto;
+			background-color: #010000;
+			border-radius: 5px;
+			display: inline-block;
+			height: 300px;
+		}
+		#titulo{
+			text-align: left;
+			color: aliceblue;
+			padding-left: 10px;
+			font-size: 25px;
+		}
+		#subtitulo{
+			text-align: left;
+			color: aliceblue;
+			padding-left: 10px;
+			font-size:20px;
+			border: double 3px #09B4C9;
+		}
+		label{
+			border-color: aliceblue;
+			color: chartreuse;
+			padding-left: 15px;
+			font-size: 18px;
+			font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "DejaVu Sans", Verdana, "sans-serif";
+		}
+		#texto{
+			margin-left: 10px;
+			margin-top: 10px;
+		}
+		button{
+			background-color: #5B5B5B;
+			border-radius: 7px;
+			color: aqua;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">  
+
+		<div class="table">
+			<p id="titulo">
+				Datos del formulario <br>
+			</p>
+
+			<p id="subtitulo">
+				Ingrese un valor:    <br> 
+			</p>
+
+			<input type="text"  name="texto" id="texto">
+			<button data-info='<?= $info ?>' >
+				Copiar datos 
+			</button>
+			<br>
+			<p id="subtitulo">
+				Copia del valor	 
+			</p>
+			<label>
+				
+			</label>
+			
+	</div> 
+
+
+	<script type="text/javascript" src="assets/jquery-3.5.1.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){ 
+
+			$("button").on('click',function(){
+				var texto = $("#texto").val()
+				var label = $("label").html(texto)
+			})
+
+		})
+		
+	</script> 
+</body>
+</html>
