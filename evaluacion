@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Canvas
+	</title>
+	<style type="text/css">
+		.container{
+			width: 40%;
+			margin: auto;
+			min-height: 200px;
+		} 
+		canvas{
+			background-color: #E40C10;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<canvas id="canvas" width="350" height="300">
+			Opps tu navegador no soporta CANVAS
+		</canvas>
+	</div>
+	<script type="text/javascript">
+		var canvas = null, ctx = null,x=0,y=210; 
+		var LEFT = 1,UP = 0, RIGHT = 2, DOWN = 3;
+		var lastPress = null, speed = 0.2;
+		var player = null, food = null, score = 0;
+		var pause = false, walls = Array(), gameOver = false;
+		var player_body=new Image();
+		var crunsh=new Audio(),die=new Audio(), sound_p=new Audio();
+
+		window.requestAnimationFrame = (function(){
+			return window.requestAnimationFrame || 
+				window.mozRequestAnimationFrame ||
+				window.webkitRequestAnimationFrame ||
+				function (callback){
+					window.setTimeout(callback,17);
+				}
+		}());
+
+		function Rectangle(x,y,w,h,c){
+			this.x=x;
+			this.y=y;
+			this.w=w;
+			this.h=h;
+			this.c=c;
+
+			this.paint =function(ctx){
+				ctx.fillStyle=this.c;
+				ctx.fillRect(this.x,this.y,this.w,this.h);
+			}
+
+			this.intersects = function(target){
+				if( this.x < target.x + target.w  && 
+					this.x + this.w > target.x    &&
+					this.y < target.y + target.h  &&
+					this.y + this.h > target.y){
+					return true;
+				}
+			}
+		}
+
+		function paint(ctx)
+		{
+			ctx.fillStyle = "#000";
+			ctx.fillRect(0,0,canvas.width,canvas.height);
+
+			ctx.drawImage(player_body,player.x,player.y);
+
+			for (var i = walls.length - 1; i >= 0; i--) {
+				walls[i].paint(ctx)
+			} 
+
+			if(pause && !gameOver){
+				ctx.fillStyle="white";
+				ctx.textAlign = "center";
+				ctx.fillText('P A U S E',170,150);
+			}
+
+			if(gameOver){
+				ctx.fillStyle="white";
+				ctx.textAlign = "center";
+				ctx.fillText('G A M E O V E R',195,150);
+			}
+
+		}
+
+		function upt(){
+
+			if(!pause)
+			{
+				if(!gameOver){ 
+
+					if (lastPress==UP) {
+						player.y -=speed;
+						if(player.y<0){
+							player.y = canvas.height;
+						}
+					}
+					if (lastPress==DOWN) {
+						player.y += speed;
+						if(player.y>=canvas.height){
+							player.y = -10;
+						}
+					}
+					if (lastPress==LEFT) {
+						player.x -= speed;
+						if (player.x<0) {
+							player.x = canvas.width;
+						}
+					}
+					if (lastPress==RIGHT) {
+						player.x += speed;
+						if(player.x>canvas.width){
+							player.x = -10;
+						}
+					}  
+					
+
+					for (var i = walls.length - 1; i >= 0; i--) {
+						if(player.intersects(walls[i])){
+							gameOver = true;
+							setTimeout('reset()',3000);
+							die.play();
+						}
+					}
+				
+				}
+			}
+		}
+
+		//se repite mucho
+		function run(){
+			window.requestAnimationFrame(run)
+			upt();
+			paint(ctx);
+		}
+
+		function reset(){
+			gameOver = false;
+			lastPress = null;
+			spped = null;
+			speed = 0.5;
+			die.pause();
+			die.currentTime=0;
+
+			player.x = 0;
+			player.y = 210;
+		}
+
+		function init(){
+			canvas = document.getElementById('canvas');
+			ctx = canvas.getContext('2d');
+			ctx.clearRect(0,0, canvas.width, canvas.height);
+
+			player = new Rectangle(x,y,10,10,"#00FF00")
+			player_body.src="mario.png";
+		
+			die.src="die.mp3";
+			sound_p.src="sound_p.mp3";
+			
+			//arriba
+			walls.push(new Rectangle(0,0,350,10,"purple")) 
+			//
+			walls.push(new Rectangle(22,10,3,30,"red")) 
+			walls.push(new Rectangle(60,10,3,30,"red")) 
+			walls.push(new Rectangle(110,10,3,15,"red")) 
+			walls.push(new Rectangle(155,10,3,30,"red")) 
+			walls.push(new Rectangle(185,10,3,30,"red")) 
+			walls.push(new Rectangle(185,23,30,2,"red")) 
+			walls.push(new Rectangle(245,10,3,15,"red")) 
+			walls.push(new Rectangle(280,10,3,75,"red"))
+			walls.push(new Rectangle(265,60,33,1.5,"red"))
+			
+			walls.push(new Rectangle(10,55,100,2,"white")) 
+			walls.push(new Rectangle(40,25,2,30,"white")) 
+			walls.push(new Rectangle(80,40,2,45,"white"))
+			walls.push(new Rectangle(80,85,29,1.5,"white"))
+			walls.push(new Rectangle(109,85,1.5,15,"white"))
+			
+			walls.push(new Rectangle(60,25,35,2,"green"))
+			walls.push(new Rectangle(95,25,2,15,"green"))
+			walls.push(new Rectangle(97,72,29,1.5,"green"))
+			walls.push(new Rectangle(95,40,30,2,"green"))
+			walls.push(new Rectangle(125,26,1.5,65,"green"))
+			walls.push(new Rectangle(150,90,1.5,20,"green"))
+			walls.push(new Rectangle(125,90,25,1.5,"green"))
+			
+			walls.push(new Rectangle(140,26,1.5,30,"white"))
+			
+			walls.push(new Rectangle(140,56,45,1.5,"white"))
+			walls.push(new Rectangle(170,26,1.5,30,"white"))
+			walls.push(new Rectangle(185,56,1.5,15,"white"))
+			walls.push(new Rectangle(185,71,17,1.5,"white"))
+			walls.push(new Rectangle(200,40,1.5,32,"white"))
+			walls.push(new Rectangle(200,40,60,1.5,"white"))
+			walls.push(new Rectangle(230,25,1.5,15,"white"))
+			walls.push(new Rectangle(260,25,1.5,17,"white"))
+			walls.push(new Rectangle(300,25,40,1.5,"white"))
+			
+			walls.push(new Rectangle(250,40,1.5,50,"white"))
+			walls.push(new Rectangle(250,74,15,1.5,"white"))
+			walls.push(new Rectangle(250,90,18,1.5,"white"))
+			walls.push(new Rectangle(268,90,1.5,35,"white"))
+			walls.push(new Rectangle(248,115,20,1.5,"white"))
+			walls.push(new Rectangle(268,125,22,1.5,"white"))
+			
+			
+			//izquierda arriba
+			walls.push(new Rectangle(0,0,10,205,"purple")) 
+			
+			walls.push(new Rectangle(0,203,26,1.5,"purple"))
+			walls.push(new Rectangle(25,185,1.5,20,"purple"))
+			walls.push(new Rectangle(25,185,50,1.5,"purple"))
+			walls.push(new Rectangle(40,160,1.5,25,"purple"))
+			walls.push(new Rectangle(75,155,1.5,50,"purple"))
+			walls.push(new Rectangle(75,205,40,1.5,"purple"))
+			walls.push(new Rectangle(100,205,1.5,10,"purple"))
+			walls.push(new Rectangle(115,195,1.5,12,"purple"))
+			
+			walls.push(new Rectangle(10,90,30,1.5,"red"))
+			walls.push(new Rectangle(10,170,15,1.5,"red"))
+			walls.push(new Rectangle(25,141,1.5,30,"red"))
+			walls.push(new Rectangle(26,141,52,1.5,"red"))
+			walls.push(new Rectangle(43,121,1.5,21,"red"))
+			walls.push(new Rectangle(57,141,1.5,27,"red"))
+			walls.push(new Rectangle(77,125,1.5,17,"red"))
+			
+			
+			
+			walls.push(new Rectangle(25,70,35,1.5,"yellow"))
+			walls.push(new Rectangle(60,70,1.5,55,"yellow"))
+			walls.push(new Rectangle(27,105,65,1.5,"yellow"))
+			walls.push(new Rectangle(92,105,1.5,81,"yellow"))
+			walls.push(new Rectangle(92,120,15,1.5,"yellow"))
+			walls.push(new Rectangle(92,140,33,1.5,"yellow"))
+			walls.push(new Rectangle(92,185,10,1.5,"yellow"))
+			walls.push(new Rectangle(102,160,1.5,27,"yellow"))
+			walls.push(new Rectangle(125,125,1.5,35,"yellow"))
+			walls.push(new Rectangle(27,105,1.5,15,"yellow"))
+			walls.push(new Rectangle(125,160,10,1.5,"yellow"))
+			walls.push(new Rectangle(104,175,50,1.5,"yellow"))
+			walls.push(new Rectangle(125,125,10,1.5,"yellow"))
+			walls.push(new Rectangle(135,112,1.5,14,"yellow"))
+			walls.push(new Rectangle(135,110,50,1.5,"yellow"))
+			
+			
+			
+			//izquierda abajo
+			walls.push(new Rectangle(0,225,10,75,"purple")) 
+			walls.push(new Rectangle(10,225,15,1.5,"purple")) 
+			
+			walls.push(new Rectangle(10,265,15,3,"red"))
+			
+			walls.push(new Rectangle(40,210,1.5,65,"blue"))
+			walls.push(new Rectangle(41,210,10,1.5,"blue"))
+			walls.push(new Rectangle(51,210,1.5,20,"blue"))
+			walls.push(new Rectangle(25,244,81,3,"blue"))
+			walls.push(new Rectangle(82,244,1.5,27,"blue"))
+			walls.push(new Rectangle(105,244,1.5,17,"blue"))
+			walls.push(new Rectangle(105,260,105,1.5,"blue"))
+			walls.push(new Rectangle(125,260,1.5,15,"blue"))
+			walls.push(new Rectangle(150,225,1.5,35,"blue"))
+			
+			
+			walls.push(new Rectangle(68,228,60,1.5,"orange"))
+			walls.push(new Rectangle(128,215,1.5,32,"orange"))
+			walls.push(new Rectangle(128,215,60,1.5,"orange"))
+			
+			///////
+			walls.push(new Rectangle(128,215,60,1.5,"orange"))
+			walls.push(new Rectangle(168,215,1.5,15,"orange"))
+			walls.push(new Rectangle(188,130,1.5,85,"orange"))
+			walls.push(new Rectangle(160,130,28,1.5,"orange"))
+			walls.push(new Rectangle(149,150,61,1.5,"orange"))
+			walls.push(new Rectangle(210,110,1.5,85,"orange"))
+			walls.push(new Rectangle(210,110,25,1.5,"orange"))
+			walls.push(new Rectangle(210,195,25,1.5,"orange"))
+			
+			walls.push(new Rectangle(210,215,1.5,60,"blue"))
+			walls.push(new Rectangle(210,215,15,1.5,"blue"))
+			walls.push(new Rectangle(225,215,1.5,20,"blue"))
+			walls.push(new Rectangle(225,235,15,1.5,"blue"))
+			
+			
+			////
+			walls.push(new Rectangle(62,261,1.5,29,"red"))
+			walls.push(new Rectangle(105,278,1.5,12,"red"))
+			
+			
+			//derecha arriba
+			walls.push(new Rectangle(340,0,10,80,"purlple"))
+			
+			walls.push(new Rectangle(300,45,20,1.5,"purple"))
+			walls.push(new Rectangle(320,45,1.5,35,"purple"))
+			walls.push(new Rectangle(305,79,35,1.5,"purple"))
+			walls.push(new Rectangle(305,79,1.5,20,"purple"))
+			walls.push(new Rectangle(290,98,16,1.5,"purple"))
+			walls.push(new Rectangle(290,98,1.5,45,"purple"))
+			walls.push(new Rectangle(290,142,24,1.5,"purple"))
+			walls.push(new Rectangle(290,98,16,1.5,"purple"))
+			walls.push(new Rectangle(314,132,1.5,23,"purple"))
+			walls.push(new Rectangle(314,110,16,1.5,"purple"))
+			walls.push(new Rectangle(314,110,1.5,10,"purple"))
+			walls.push(new Rectangle(220,60,15,1.5,"purple"))
+			walls.push(new Rectangle(220,60,1.5,27,"purple"))
+			walls.push(new Rectangle(170,85,50,1.5,"purple"))
+			walls.push(new Rectangle(170,75,1.5,10,"purple"))
+			walls.push(new Rectangle(145,75,25,1.5,"purple"))
+			
+			//derecha abajo
+			walls.push(new Rectangle(340,100,10,200,"purple"))
+			walls.push(new Rectangle(330,100,10,1.5,"purple"))
+			walls.push(new Rectangle(330,100,1.5,70,"purple"))
+			walls.push(new Rectangle(302,170,30,1.5,"purple"))
+			walls.push(new Rectangle(275,160,27,1.5,"purple"))
+			walls.push(new Rectangle(275,142,1.5,18,"purple"))
+			walls.push(new Rectangle(255,142,20,1.5,"purple"))
+			walls.push(new Rectangle(255,130,1.5,13,"purple"))
+			walls.push(new Rectangle(235,130,20,1.5,"purple"))
+			
+			walls.push(new Rectangle(235,103,15,1.5,"purple"))
+			
+			walls.push(new Rectangle(235,60,1.5,70,"purple"))
+			walls.push(new Rectangle(302,160,1.5,45,"purple"))
+			walls.push(new Rectangle(284,205,30,1.5,"purple"))
+			walls.push(new Rectangle(314,205,1.5,70,"purple"))
+			walls.push(new Rectangle(314,217,13,1.5,"oraneg"))
+			walls.push(new Rectangle(300,245,25,1.5,"purple"))
+			walls.push(new Rectangle(314,273,13,1.5,"purple"))
+			
+			
+			walls.push(new Rectangle(320,185,25,1.5,"red"))
+			walls.push(new Rectangle(330,205,15,1.5,"red"))
+			walls.push(new Rectangle(330,230,15,1.5,"red"))
+			walls.push(new Rectangle(330,257,15,1.5,"red"))
+			
+			//abajo
+			walls.push(new Rectangle(0,290,350,10,"purple"))
+			
+			walls.push(new Rectangle(140,275,2,15,"red"))
+			walls.push(new Rectangle(195,275,2,15,"red"))
+			walls.push(new Rectangle(228,275,2,15,"red"))
+			
+			walls.push(new Rectangle(255,220,2,70,"red"))
+			walls.push(new Rectangle(240,220,15,1.5,"red"))
+			walls.push(new Rectangle(255,235,15,1.5,"red"))
+			walls.push(new Rectangle(255,265,13,1.5,"red"))
+			walls.push(new Rectangle(230,250,25,1.5,"red"))
+			
+			walls.push(new Rectangle(298,265,1.5,25,"red"))
+			walls.push(new Rectangle(270,190,1.5,30,"red"))
+			walls.push(new Rectangle(270,190,18,1.5,"red"))
+			walls.push(new Rectangle(288,176,1.5,16,"red"))
+			walls.push(new Rectangle(285,233,13,1.5,"red"))
+			walls.push(new Rectangle(285,265,13,1.5,"red"))
+			walls.push(new Rectangle(285,220,1.5,57,"red"))
+			walls.push(new Rectangle(270,220,30,1.5,"red"))
+			walls.push(new Rectangle(270,250,15,1.5,"red"))
+			walls.push(new Rectangle(275,275,10,1.5,"red"))
+			//
+			 
+			run();
+		}
+
+		window.addEventListener('load',init,false);  
+
+		document.addEventListener('keydown',function(e){
+			if(e.keyCode== 87 || e.keyCode == 38 && !pause){
+				lastPress = UP;
+			}
+			if(e.keyCode== 83 || e.keyCode == 40 && !pause){
+				lastPress = DOWN;
+			}
+			if(e.keyCode== 65 || e.keyCode == 37 && !pause){
+				lastPress = LEFT;
+			}
+			if(e.keyCode== 68 || e.keyCode == 39 && !pause){
+				lastPress = RIGHT;
+			}
+			if(e.keyCode==32){
+				pause = (pause)?false:true;
+				sound_p.play();
+			}
+		})
+		 
+		function random(x){
+			return Math.floor(Math.random()*x)
+		}
+	</script>
+</body>
+</html>
