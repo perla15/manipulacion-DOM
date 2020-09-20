@@ -37,7 +37,7 @@
 <script type="text/javascript">
 	
 	$("button").click(function(){
-		$.get('file.txt?=1',function(i){	
+		$.get('info.html?=1',function(i){
 			$(".super_div").append(i)
 		})
 	
