@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ejercicio 1</title>
+
+	<style type="text/css">
+		.container{
+			width: 80%;
+			background-color: gray;
+			margin: auto;
+			min-height: 500px;
+		}
+		canvas{
+			background-color: #F7D358;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<canvas id="canvas" width="400" height="300">
+			Oops tu navegador no soporta CANVAS
+		</canvas>
+	</div>
+	<script type="text/javascript">
+		var canvas=document.getElementById('canvas');
+		if (canvas) {
+			var ctx=canvas.getContext('2d');
+      
+			ctx.moveTo(0,0);
+			ctx.lineTo(200,100);
+			ctx.stroke();
+			
+		}
+		
+	</script>
+
+</body>
+</html>
